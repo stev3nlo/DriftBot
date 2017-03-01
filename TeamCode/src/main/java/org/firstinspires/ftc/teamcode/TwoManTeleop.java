@@ -7,10 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Created by Steven on 12/15/2016.
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="OneManTeleop", group="OneManTeleop")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TwoManTeleop", group="Teleop")
 public class TwoManTeleop extends LinearOpMode {
 
-	protected double speed;
+	protected double speedL;
+	protected double speedR;
 	protected DcMotor motorL;
 	protected DcMotor motorR;
 
@@ -18,41 +19,40 @@ public class TwoManTeleop extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		motorL = hardwareMap.dcMotor.get("motorL");
 		motorR = hardwareMap.dcMotor.get("motorR");
-		speed = 1;
+		speedL = 0;
+		speedR = 0;
+		motorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		motorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 		waitForStart();
 
 		while (opModeIsActive()) {
-			if (Math.abs(gamepad2.left_stick_y) > .05) {
-				motorL.setPower(-gamepad2.left_stick_y * speed);
+			if (Math.abs(gamepad1.left_stick_y) > .05) {
+				motorL.setPower(-gamepad1.left_stick_y * speedL);
 			} else {
 				motorL.setPower(0);
 			}
-			if (Math.abs(gamepad1.right_stick_y) > .05) {
-				motorR.setPower(gamepad1.right_stick_y * speed);
+			if (Math.abs(gamepad2.right_stick_y) > .05) {
+				motorR.setPower(gamepad2.right_stick_y * speedR);
 			} else {
 				motorR.setPower(0);
 			}
-			if (gamepad1.left_bumper) {
-				if (speed > 0) {
-					speed -= .1;
-					Thread.sleep(200);
-				}
+			if (gamepad1.right_trigger > .05) {
+				speedL = gamepad1.right_trigger;
+				speedL = (speedL / 2) + .5;
 			} else {
-				if (gamepad1.right_bumper) {
-					if (speed < 1) {
-						speed += .1;
-						Thread.sleep(200);
-					}
-				}
+				speedL = 0;
 			}
-			if (speed > 1) {
-				speed = 1;
+
+			if (gamepad2.right_trigger > .05) {
+				speedR = gamepad2.right_trigger;
+				speedR = (speedR / 2) + .5;
+			} else {
+				speedR = 0;
 			}
-			if (speed < .3) {
-				speed = .3;
-			}
-			telemetry.addData("speed", speed);
+
+			telemetry.addData("speedL", speedL);
+			telemetry.addData("speedR", speedR);
 			telemetry.update();
 		}
 	}

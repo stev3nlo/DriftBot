@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Created by Steven on 12/15/2016.
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="OneManTeleop", group="OneManTeleop")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="OneManTeleop", group="Teleop")
 public class OneManTeleop extends LinearOpMode {
 
 	protected double speed;
@@ -18,7 +18,9 @@ public class OneManTeleop extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		motorL = hardwareMap.dcMotor.get("motorL");
 		motorR = hardwareMap.dcMotor.get("motorR");
-		speed = 1;
+		speed = 0;
+		motorL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		motorR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 		waitForStart();
 
@@ -33,24 +35,12 @@ public class OneManTeleop extends LinearOpMode {
 			} else {
 				motorR.setPower(0);
 			}
-			if (gamepad1.left_bumper) {
-				if (speed > 0) {
-					speed -= .1;
-					Thread.sleep(200);
-				}
+
+			if (gamepad1.right_trigger > .05) {
+				speed = gamepad1.right_trigger;
+				speed = (speed / 2) + .5;
 			} else {
-				if (gamepad1.right_bumper) {
-					if (speed < 1) {
-						speed += .1;
-						Thread.sleep(200);
-					}
-				}
-			}
-			if (speed > 1) {
-				speed = 1;
-			}
-			if (speed < .3) {
-				speed = .3;
+				speed = 0;
 			}
 			telemetry.addData("speed", speed);
 			telemetry.update();
